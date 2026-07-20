@@ -74,23 +74,24 @@ export function createNextConstraint(
   const activeKinds = new Set(
     activeConstraints.map((constraint) => constraint.kind),
   );
-  const candidateKinds = CONSTRAINT_KINDS.filter(
-    (kind) =>
-      !activeKinds.has(kind) &&
-      canAddConstraintKind(kind, activeConstraints, word),
-  );
-
-  while (candidateKinds.length > 0) {
-    const index = getRandomIndex(candidateKinds.length, random);
-    const [kind] = candidateKinds.splice(index, 1);
-    const constraint = createConstraint(kind, random);
-
-    if (describeConstraint(constraint).validate(word)) {
-      return constraint;
+  const candidates = CONSTRAINT_KINDS.flatMap((kind) => {
+    if (
+      activeKinds.has(kind) ||
+      !canAddConstraintKind(kind, activeConstraints, word)
+    ) {
+      return [];
     }
+
+    return createConstraintCandidates(kind).filter((constraint) =>
+      describeConstraint(constraint).validate(word),
+    );
+  });
+
+  if (candidates.length === 0) {
+    return undefined;
   }
 
-  return undefined;
+  return candidates[getRandomIndex(candidates.length, random)];
 }
 
 export function describeConstraint(
@@ -199,49 +200,35 @@ export function getActiveConstraintDefinitions(
   return activeConstraints.map(describeConstraint);
 }
 
-function createConstraint(
-  kind: ConstraintKind,
-  random: () => number,
-): ActiveConstraint {
+function createConstraintCandidates(kind: ConstraintKind): ActiveConstraint[] {
   switch (kind) {
-    case "min-length": {
-      const minLength = pickRandom(MIN_LENGTH_OPTIONS, random);
-      return {
+    case "min-length":
+      return MIN_LENGTH_OPTIONS.map((minLength) => ({
         id: `${kind}-${minLength}`,
         kind,
         minLength,
-      };
-    }
+      }));
 
-    case "max-length": {
-      const maxLength = pickRandom(MAX_LENGTH_OPTIONS, random);
-      return {
+    case "max-length":
+      return MAX_LENGTH_OPTIONS.map((maxLength) => ({
         id: `${kind}-${maxLength}`,
         kind,
         maxLength,
-      };
-    }
+      }));
 
-    case "require-specific-kana": {
-      const requiredKana = pickRandom(REQUIRED_KANA_OPTIONS, random);
-      return {
+    case "require-specific-kana":
+      return REQUIRED_KANA_OPTIONS.map((requiredKana) => ({
         id: `${kind}-${requiredKana}`,
         kind,
         requiredKana,
-      };
-    }
+      }));
 
     default:
-      return {
+      return [{
         id: kind,
         kind,
-      };
+      }];
   }
-}
-
-function pickRandom<T>(items: T[], random: () => number): T {
-  const index = getRandomIndex(items.length, random);
-  return items[index];
 }
 
 function getRandomIndex(length: number, random: () => number): number {

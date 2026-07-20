@@ -18,28 +18,41 @@ describe('constraints', () => {
     expect(nextConstraint?.kind).toBe('require-specific-kana');
   });
 
-  it('creates randomized min-length constraints', () => {
-    const nextConstraint = createNextConstraint([], 'あいうえおかきく', sequence([0, 0.99]));
-
-    expect(nextConstraint).toEqual({
-      id: 'min-length-7',
-      kind: 'min-length',
-      minLength: 7,
-    });
-    expect(describeConstraint(nextConstraint!).title).toBe('7文字以上');
-  });
-
-  it('creates randomized max-length constraints', () => {
+  it('creates min-length constraints only from thresholds satisfied by the current word', () => {
     const activeConstraints: ActiveConstraint[] = [
       { id: 'no-katakana', kind: 'no-katakana' },
       { id: 'no-dakuten', kind: 'no-dakuten' },
       { id: 'no-small-kana', kind: 'no-small-kana' },
+      { id: 'max-length-5', kind: 'max-length', maxLength: 5 },
+      { id: 'require-long-vowel', kind: 'require-long-vowel' },
+      { id: 'require-repeated-character', kind: 'require-repeated-character' },
+      { id: 'require-specific-kana-あ', kind: 'require-specific-kana', requiredKana: 'あ' },
     ];
 
-    const nextConstraint = createNextConstraint(activeConstraints, 'あめ', sequence([0.2, 0.99]));
+    const nextConstraint = createNextConstraint(activeConstraints, 'あいうえお', () => 0.99);
 
-    expect(nextConstraint).toEqual({ id: 'max-length-7', kind: 'max-length', maxLength: 7 });
-    expect(describeConstraint(nextConstraint!).title).toBe('7文字以内');
+    expect(nextConstraint).toEqual({
+      id: 'min-length-5',
+      kind: 'min-length',
+      minLength: 5,
+    });
+    expect(describeConstraint(nextConstraint!).title).toBe('5文字以上');
+  });
+
+  it('creates max-length constraints only from thresholds satisfied by the current word', () => {
+    const activeConstraints: ActiveConstraint[] = [
+      { id: 'no-katakana', kind: 'no-katakana' },
+      { id: 'no-dakuten', kind: 'no-dakuten' },
+      { id: 'no-small-kana', kind: 'no-small-kana' },
+      { id: 'require-long-vowel', kind: 'require-long-vowel' },
+      { id: 'require-repeated-character', kind: 'require-repeated-character' },
+      { id: 'require-specific-kana-あ', kind: 'require-specific-kana', requiredKana: 'あ' },
+    ];
+
+    const nextConstraint = createNextConstraint(activeConstraints, 'あいうえおか', sequence([0.5, 0]));
+
+    expect(nextConstraint).toEqual({ id: 'max-length-6', kind: 'max-length', maxLength: 6 });
+    expect(describeConstraint(nextConstraint!).title).toBe('6文字以内');
   });
 
   it('does not add max-length constraints when min-length is already active', () => {
@@ -57,7 +70,7 @@ describe('constraints', () => {
     expect(nextConstraint?.kind).toBe('require-specific-kana');
   });
 
-  it('creates randomized specific-kana constraints', () => {
+  it('creates specific-kana constraints only from kana in the current word', () => {
     const activeConstraints: ActiveConstraint[] = [
       { id: 'min-length-3', kind: 'min-length', minLength: 3 },
       { id: 'no-katakana', kind: 'no-katakana' },
@@ -68,14 +81,14 @@ describe('constraints', () => {
       { id: 'require-repeated-character', kind: 'require-repeated-character' },
     ];
 
-    const nextConstraint = createNextConstraint(activeConstraints, 'あめ', () => 0);
+    const nextConstraint = createNextConstraint(activeConstraints, 'すいか', () => 0);
 
     expect(nextConstraint).toEqual({
-      id: 'require-specific-kana-あ',
+      id: 'require-specific-kana-い',
       kind: 'require-specific-kana',
-      requiredKana: 'あ',
+      requiredKana: 'い',
     });
-    expect(describeConstraint(nextConstraint!).title).toBe('「あ」必須');
+    expect(describeConstraint(nextConstraint!).title).toBe('「い」必須');
   });
 
   it('skips no-dakuten constraints when the current word ends with dakuten', () => {
@@ -100,7 +113,7 @@ describe('constraints', () => {
     const nextConstraint = createNextConstraint(
       activeConstraints,
       'あいうえおかきく',
-      sequence([0, 0, 0, 0, 0]),
+      () => 0,
     );
 
     expect(nextConstraint).toEqual({

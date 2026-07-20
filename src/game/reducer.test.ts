@@ -168,7 +168,7 @@ describe('gameReducer', () => {
     ]);
   });
 
-  it('retries constraint addition on the next valid turn when no constraint could be added', () => {
+  it('adds a viable parameterized constraint without deferring it', () => {
     const almostFullConstraintState: GameState = {
       ...initialGameState,
       status: 'playing',
@@ -184,10 +184,46 @@ describe('gameReducer', () => {
       turnCount: 2,
     };
 
-    const noConstraintAddedState = gameReducer(almostFullConstraintState, {
+    const constraintAddedState = gameReducer(almostFullConstraintState, {
       type: 'SUBMIT_WORD',
       word: 'すいか',
-      random: sequence([0, 0, 0, 0]),
+      random: () => 0,
+    });
+
+    expect(constraintAddedState.turnCount).toBe(3);
+    expect(constraintAddedState.activeConstraints).toHaveLength(5);
+    expect(
+      constraintAddedState.activeConstraints[
+        constraintAddedState.activeConstraints.length - 1
+      ],
+    ).toEqual({
+      id: 'require-specific-kana-い',
+      kind: 'require-specific-kana',
+      requiredKana: 'い',
+    });
+    expect(constraintAddedState.pendingConstraintCount).toBe(0);
+  });
+
+  it('retries constraint addition on the next valid turn when no concrete constraint can be added', () => {
+    const almostFullConstraintState: GameState = {
+      ...initialGameState,
+      status: 'playing',
+      players: ['春', '夏'],
+      words: ['あり', 'りを'],
+      activeConstraints: [
+        { id: 'min-length-3', kind: 'min-length', minLength: 3 },
+        { id: 'no-katakana', kind: 'no-katakana' },
+        { id: 'no-dakuten', kind: 'no-dakuten' },
+        { id: 'no-small-kana', kind: 'no-small-kana' },
+      ],
+      constraintInterval: 3,
+      turnCount: 2,
+    };
+
+    const noConstraintAddedState = gameReducer(almostFullConstraintState, {
+      type: 'SUBMIT_WORD',
+      word: 'をゐゑ',
+      random: () => 0,
     });
 
     expect(noConstraintAddedState.turnCount).toBe(3);
@@ -196,7 +232,7 @@ describe('gameReducer', () => {
 
     const retriedState = gameReducer(noConstraintAddedState, {
       type: 'SUBMIT_WORD',
-      word: 'かーか',
+      word: 'ゑかか',
       random: () => 0,
     });
 
@@ -208,8 +244,8 @@ describe('gameReducer', () => {
     }
     expect(retriedState.lastResult.addedConstraints).toEqual([
       {
-        id: 'require-long-vowel',
-        kind: 'require-long-vowel',
+        id: 'require-repeated-character',
+        kind: 'require-repeated-character',
       },
     ]);
   });
