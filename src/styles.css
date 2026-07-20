@@ -1,0 +1,537 @@
+:root {
+  color: #25302b;
+  background: #f4f6f1;
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  min-height: 44px;
+  border: 2px solid #25302b;
+  border-radius: 8px;
+  background: #f2c14e;
+  color: #25302b;
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    transform 120ms ease,
+    box-shadow 120ms ease,
+    background 120ms ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 0 #25302b;
+}
+
+button:active {
+  transform: translateY(1px);
+  box-shadow: none;
+}
+
+input {
+  width: 100%;
+  min-height: 48px;
+  border: 2px solid #25302b;
+  border-radius: 8px;
+  padding: 0 14px;
+  background: #ffffff;
+  color: #25302b;
+  outline: none;
+}
+
+input:focus {
+  border-color: #0f8b6f;
+  box-shadow: 0 0 0 3px rgba(15, 139, 111, 0.18);
+}
+
+.appShell {
+  width: min(1120px, calc(100vw - 32px));
+  margin: 0 auto;
+  padding: 32px 0;
+}
+
+.appHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.appHeader h1 {
+  margin: 0;
+  font-size: clamp(28px, 3.8vw, 48px);
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.appIcon {
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.eyebrow {
+  margin: 0;
+  color: #0f8b6f;
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.setupLayout,
+.gameLayout {
+  display: grid;
+  gap: 18px;
+}
+
+.setupLayout {
+  grid-template-columns: minmax(0, 1fr) 320px;
+}
+
+.gameLayout {
+  grid-template-columns: minmax(0, 1.2fr) minmax(240px, 0.8fr);
+  grid-template-areas:
+    "turn rules"
+    "history history";
+}
+
+.setupPanel,
+.startPanel,
+.turnPanel,
+.rulesPanel,
+.historyPanel,
+.finishPanel {
+  border: 2px solid #25302b;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.setupPanel,
+.turnPanel,
+.rulesPanel,
+.historyPanel,
+.finishPanel {
+  padding: 22px;
+}
+
+.startPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+}
+
+.turnPanel {
+  grid-area: turn;
+  background: #fff9dc;
+}
+
+.rulesPanel {
+  grid-area: rules;
+}
+
+.historyPanel {
+  grid-area: history;
+}
+
+.fieldLabel,
+.panelHeading,
+.turnTopline {
+  color: #5b655f;
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.inlineForm,
+.wordForm {
+  display: grid;
+  gap: 8px;
+}
+
+.inputRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 104px;
+  gap: 10px;
+}
+
+.playerList {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.playerItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 52px;
+  border: 2px solid #25302b;
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: #f4f6f1;
+}
+
+.playerItem span {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.playerItem strong {
+  display: inline-grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border-radius: 999px;
+  background: #0f8b6f;
+  color: #ffffff;
+  font-size: 14px;
+}
+
+.ghostButton {
+  min-height: 36px;
+  border-color: #6f7974;
+  background: #ffffff;
+  color: #25302b;
+  font-size: 14px;
+}
+
+.primaryButton {
+  width: 100%;
+  min-height: 54px;
+  background: #0f8b6f;
+  color: #ffffff;
+}
+
+.meter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: #25302b;
+  color: #ffffff;
+}
+
+.meter span {
+  color: #cbd6d0;
+  font-weight: 800;
+}
+
+.meter strong {
+  font-size: 30px;
+  line-height: 1;
+}
+
+.settingGroup {
+  display: grid;
+  gap: 8px;
+}
+
+.segmentedControl {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.segmentedControl button {
+  min-height: 40px;
+  padding: 0 8px;
+  border-color: #6f7974;
+  background: #ffffff;
+  font-size: 14px;
+  box-shadow: none;
+}
+
+.segmentedControl button.selected {
+  border-color: #25302b;
+  background: #f2c14e;
+}
+
+.turnTopline,
+.panelHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.turnPanel h2 {
+  margin: 14px 0 6px;
+  font-size: clamp(30px, 4vw, 48px);
+  line-height: 1;
+  overflow-wrap: anywhere;
+}
+
+.nextLetter {
+  display: inline-flex;
+  margin: 0 0 22px;
+  border: 2px solid #25302b;
+  border-radius: 8px;
+  padding: 8px 12px;
+  background: #ffffff;
+  font-weight: 900;
+}
+
+.constraintTiming {
+  margin: -12px 0 18px;
+  color: #5b655f;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.giveUpButton {
+  width: 100%;
+  min-height: 40px;
+  margin-top: 10px;
+  border-color: #b82d22;
+  background: #ffffff;
+  color: #b82d22;
+  font-size: 14px;
+}
+
+.playerStatusList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.playerStatusList > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 2px solid #6f7974;
+  border-radius: 8px;
+  padding: 5px 8px;
+  background: #ffffff;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.playerStatusList > span.current {
+  border-color: #0f8b6f;
+  background: #e9f8f3;
+}
+
+.playerStatusList > span.eliminated {
+  color: #6f7974;
+  text-decoration: line-through;
+}
+
+.playerStatusList small {
+  color: #b82d22;
+  font-size: 11px;
+  text-decoration: none;
+}
+
+.resultMessage {
+  margin: 16px 0 0;
+  border: 2px solid currentColor;
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-weight: 800;
+  line-height: 1.5;
+  white-space: pre-line;
+}
+
+.resultMessage.success {
+  color: #0f6e57;
+  background: #e9f8f3;
+}
+
+.resultMessage.failure {
+  color: #b82d22;
+  background: #fff0ee;
+}
+
+.constraintList {
+  display: grid;
+  gap: 10px;
+  padding: 0;
+  margin: 18px 0 0;
+  list-style: none;
+}
+
+.constraintList li {
+  display: grid;
+  gap: 2px;
+  border-left: 6px solid #e05242;
+  border-radius: 6px;
+  padding: 8px 10px;
+  background: #f4f6f1;
+}
+
+.constraintList strong {
+  font-size: 16px;
+}
+
+.constraintList span {
+  color: #5b655f;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.wordHistory {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 0;
+  margin: 18px 0;
+  list-style: none;
+}
+
+.wordHistory li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  border: 2px solid #25302b;
+  border-radius: 8px;
+  padding: 8px 12px;
+  background: #ffffff;
+  font-weight: 800;
+}
+
+.wordHistory li.homophone {
+  border-color: #0f8b6f;
+  background: #e9f8f3;
+  box-shadow: inset 0 -3px 0 rgba(15, 139, 111, 0.2);
+}
+
+.wordHistory em {
+  border-radius: 4px;
+  padding: 3px 5px;
+  background: #0f8b6f;
+  color: #ffffff;
+  font-size: 11px;
+  font-style: normal;
+  line-height: 1;
+}
+
+.wordHistory small {
+  display: inline-grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border-radius: 999px;
+  background: #f2c14e;
+  color: #25302b;
+}
+
+.wideButton {
+  width: 100%;
+}
+
+.emptyText {
+  margin: 18px 0 0;
+  color: #6f7974;
+  font-weight: 700;
+}
+
+.finishPanel {
+  display: grid;
+  gap: 16px;
+  width: min(640px, 100%);
+  margin: 0 auto;
+  text-align: center;
+}
+
+.finishPanel h2 {
+  margin: 0;
+  font-size: clamp(36px, 6vw, 72px);
+  line-height: 1;
+}
+
+.finishPanel p {
+  margin: 0;
+  font-weight: 800;
+}
+
+.finishPanel .resultMessage {
+  margin: 0;
+  text-align: left;
+}
+
+.finalConstraints {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.finalConstraints span {
+  border: 2px solid #25302b;
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: #f2c14e;
+  font-weight: 900;
+}
+
+@media (max-width: 760px) {
+  .appShell {
+    width: min(100% - 20px, 1120px);
+    padding: 18px 0;
+  }
+
+  .setupLayout,
+  .gameLayout {
+    grid-template-columns: 1fr;
+  }
+
+  .gameLayout {
+    grid-template-areas:
+      "turn"
+      "rules"
+      "history";
+  }
+
+  .inlineForm .inputRow {
+    grid-template-columns: 1fr;
+  }
+
+  .wordForm .inputRow {
+    grid-template-columns: minmax(0, 1fr) 84px;
+    gap: 8px;
+  }
+
+  .appIcon {
+    width: 52px;
+    height: 52px;
+  }
+
+  .setupPanel,
+  .turnPanel,
+  .rulesPanel,
+  .historyPanel,
+  .finishPanel {
+    padding: 16px;
+  }
+}
