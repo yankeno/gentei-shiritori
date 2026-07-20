@@ -1,6 +1,11 @@
-import { getActiveConstraintDefinitions } from './constraints';
-import { getComparableWord, getHeadKana, getTailKana, normalizeWordInput } from './text';
-import type { ActiveConstraint, ValidationResult } from './types';
+import { getActiveConstraintDefinitions } from "./constraints";
+import {
+  getComparableWord,
+  getHeadKana,
+  getTailKana,
+  normalizeWordInput,
+} from "./text";
+import type { ActiveConstraint, ValidationResult } from "./types";
 
 type ValidateWordParams = {
   word: string;
@@ -18,14 +23,22 @@ export function validateWordSubmission({
   const normalizedWord = normalizeWordInput(word);
 
   if (!normalizedWord) {
-    return { ok: false, word: normalizedWord, reason: '単語を入力してください。' };
+    return {
+      ok: false,
+      word: normalizedWord,
+      reason: "単語を入力してください。",
+    };
   }
 
   const currentHead = getHeadKana(normalizedWord);
   const currentTail = getTailKana(normalizedWord);
 
   if (!currentHead || !currentTail) {
-    return { ok: false, word: normalizedWord, reason: '先頭と末尾の文字を判定できません。' };
+    return {
+      ok: false,
+      word: normalizedWord,
+      reason: "先頭と末尾の文字を判定できません。",
+    };
   }
 
   const previousWord = previousWords[previousWords.length - 1];
@@ -43,16 +56,28 @@ export function validateWordSubmission({
   const comparableWord = getComparableWord(normalizedWord);
   const usedWords = new Set(previousWords.map(getComparableWord));
   if (!allowUsedWord && usedWords.has(comparableWord)) {
-    return { ok: false, word: normalizedWord, reason: 'その単語はすでに使われています。' };
+    return {
+      ok: false,
+      word: normalizedWord,
+      reason: "その単語はすでに使われています。",
+    };
   }
 
-  if (currentTail === 'ん') {
-    return { ok: false, word: normalizedWord, reason: '「ん」で終わる単語は使えません。' };
+  if (currentTail === "ん") {
+    return {
+      ok: false,
+      word: normalizedWord,
+      reason: "「ん」で終わる単語は使えません。",
+    };
   }
 
   for (const constraint of getActiveConstraintDefinitions(activeConstraints)) {
     if (!constraint.validate(normalizedWord)) {
-      return { ok: false, word: normalizedWord, reason: constraint.failureMessage };
+      return {
+        ok: false,
+        word: normalizedWord,
+        reason: constraint.failureMessage,
+      };
     }
   }
 

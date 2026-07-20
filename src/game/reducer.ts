@@ -1,7 +1,7 @@
-import { createNextConstraint, describeConstraint } from './constraints';
-import { getComparableWord, normalizeWordInput } from './text';
-import type { GameAction, GameState } from './types';
-import { validateWordSubmission } from './validation';
+import { createNextConstraint, describeConstraint } from "./constraints";
+import { getComparableWord, normalizeWordInput } from "./text";
+import type { GameAction, GameState } from "./types";
+import { validateWordSubmission } from "./validation";
 
 export const CONSTRAINT_INTERVAL_OPTIONS = [3, 5, 7] as const;
 export const MAX_CONSTRAINT_OPTIONS = [1, 3, 5] as const;
@@ -9,7 +9,7 @@ export const DEFAULT_CONSTRAINT_INTERVAL = 5;
 export const DEFAULT_MAX_CONSTRAINTS = 5;
 
 export const initialGameState: GameState = {
-  status: 'setup',
+  status: "setup",
   players: [],
   eliminatedPlayerIndexes: [],
   currentPlayerIndex: 0,
@@ -24,7 +24,7 @@ export const initialGameState: GameState = {
 
 export function gameReducer(state: GameState, action: GameAction): GameState {
   switch (action.type) {
-    case 'ADD_PLAYER': {
+    case "ADD_PLAYER": {
       const name = action.name.trim();
 
       if (!name || state.players.includes(name)) {
@@ -38,8 +38,8 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       };
     }
 
-    case 'REMOVE_PLAYER': {
-      if (state.status !== 'setup') {
+    case "REMOVE_PLAYER": {
+      if (state.status !== "setup") {
         return state;
       }
 
@@ -50,12 +50,16 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       };
     }
 
-    case 'SET_CONSTRAINT_INTERVAL': {
-      if (state.status !== 'setup') {
+    case "SET_CONSTRAINT_INTERVAL": {
+      if (state.status !== "setup") {
         return state;
       }
 
-      if (!CONSTRAINT_INTERVAL_OPTIONS.some((interval) => interval === action.interval)) {
+      if (
+        !CONSTRAINT_INTERVAL_OPTIONS.some(
+          (interval) => interval === action.interval,
+        )
+      ) {
         return state;
       }
 
@@ -66,8 +70,8 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       };
     }
 
-    case 'SET_MAX_CONSTRAINTS': {
-      if (state.status !== 'setup') {
+    case "SET_MAX_CONSTRAINTS": {
+      if (state.status !== "setup") {
         return state;
       }
 
@@ -82,20 +86,20 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       };
     }
 
-    case 'START_GAME': {
+    case "START_GAME": {
       if (state.players.length < 2) {
         return {
           ...state,
           lastResult: {
-            kind: 'failure',
-            message: 'プレイヤーは2人以上登録してください。',
+            kind: "failure",
+            message: "プレイヤーは2人以上登録してください。",
           },
         };
       }
 
       return {
         ...state,
-        status: 'playing',
+        status: "playing",
         eliminatedPlayerIndexes: [],
         currentPlayerIndex: 0,
         words: [],
@@ -104,14 +108,14 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         pendingConstraintCount: 0,
         turnCount: 0,
         lastResult: {
-          kind: 'success',
-          message: 'ゲームを開始しました。',
+          kind: "success",
+          message: "ゲームを開始しました。",
         },
       };
     }
 
-    case 'SUBMIT_WORD': {
-      if (state.status !== 'playing') {
+    case "SUBMIT_WORD": {
+      if (state.status !== "playing") {
         return state;
       }
 
@@ -126,7 +130,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         return {
           ...state,
           lastResult: {
-            kind: 'failure',
+            kind: "failure",
             message: result.reason,
           },
         };
@@ -137,13 +141,21 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       const comparableWord = getComparableWord(word);
       const isApprovedHomophone =
         action.allowDuplicate === true &&
-        state.words.some((usedWord) => getComparableWord(usedWord) === comparableWord);
+        state.words.some(
+          (usedWord) => getComparableWord(usedWord) === comparableWord,
+        );
       const isConstraintTurn = turnCount % state.constraintInterval === 0;
-      const canAddConstraint = state.activeConstraints.length < state.maxActiveConstraints;
+      const canAddConstraint =
+        state.activeConstraints.length < state.maxActiveConstraints;
       const shouldAddConstraint =
-        canAddConstraint && (state.pendingConstraintCount > 0 || isConstraintTurn);
+        canAddConstraint &&
+        (state.pendingConstraintCount > 0 || isConstraintTurn);
       const addedConstraint = shouldAddConstraint
-        ? createNextConstraint(state.activeConstraints, result.word, action.random)
+        ? createNextConstraint(
+            state.activeConstraints,
+            result.word,
+            action.random,
+          )
         : undefined;
       const activeConstraints = addedConstraint
         ? [...state.activeConstraints, addedConstraint]
@@ -182,15 +194,15 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         currentPlayerIndex: nextPlayerIndex,
         turnCount,
         lastResult: {
-          kind: 'success',
+          kind: "success",
           message,
           addedConstraints: addedConstraint ? [addedConstraint] : undefined,
         },
       };
     }
 
-    case 'GIVE_UP': {
-      if (state.status !== 'playing') {
+    case "GIVE_UP": {
+      if (state.status !== "playing") {
         return state;
       }
 
@@ -209,11 +221,11 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 
         return {
           ...state,
-          status: 'finished',
+          status: "finished",
           eliminatedPlayerIndexes,
           currentPlayerIndex: winnerIndex,
           lastResult: {
-            kind: 'success',
+            kind: "success",
             message: `${player}がギブアップしました。${winner}の勝利です。`,
           },
         };
@@ -228,23 +240,23 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
           state.currentPlayerIndex,
         ),
         lastResult: {
-          kind: 'success',
+          kind: "success",
           message: `${player}がギブアップしました。以降の順番をスキップします。`,
         },
       };
     }
 
-    case 'FINISH_GAME':
+    case "FINISH_GAME":
       return {
         ...state,
-        status: 'finished',
+        status: "finished",
         lastResult: {
-          kind: 'success',
-          message: 'ゲームを終了しました。',
+          kind: "success",
+          message: "ゲームを終了しました。",
         },
       };
 
-    case 'RESET_GAME':
+    case "RESET_GAME":
       return initialGameState;
 
     default:
